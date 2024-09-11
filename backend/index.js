@@ -17,20 +17,59 @@ const pool = mysql.createPool({
     database: 'vuetest'
 });
 
+// retrieve enum options (status, category, country)
+app.get('/api/getEnums', (req, res) => {
+    // Define the SQL queries for enums
+    const queries = {
+        status: 'SELECT name AS status FROM status;',
+        category: 'SELECT DISTINCT name AS category FROM product_category;',
+        country: 'SELECT DISTINCT name AS country FROM country;'
+    };
+
+    // Helper function to execute a SQL query
+    const executeQuery = (query) => {
+        return new Promise((resolve, reject) => {
+            pool.query(query, (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results.map(row => Object.values(row)[0])); // Extract values
+                }
+            });
+        });
+    };
+
+    // Fetch status, category, and country
+    Promise.all([
+        executeQuery(queries.status),
+        executeQuery(queries.category),
+        executeQuery(queries.country)
+    ])
+        .then(([status, category, country]) => {
+            res.status(200).json({
+                status,
+                category,
+                country
+            });
+        })
+        .catch(error => {
+            console.error('Error retrieving enum options:', error);
+            res.status(500).send('Error retrieving enum options');
+        });
+});
+
+
 // retrieve sales order list
 app.get('/api/salesOrders', (req, res) => {
     const query = `
         SELECT so.object_id AS orderId,
-               c.name AS customerName,
-               s.name AS status,
-               co.name AS country,
+               so.customer_name AS customerName,
+               so.status AS status,
+               so.country AS country,
                pc.name AS category,
                pc.category_group AS categoryGroup,
                so.created_date AS createdDate
         FROM sales_order so
-        JOIN customer c ON so.customer_id = c.id
-        JOIN status s ON so.status_id = s.id
-        JOIN country co ON so.country_id = co.id
         JOIN product_category pc ON so.category_id = pc.object_id;
     `;
 
@@ -59,12 +98,10 @@ app.get('/api/salesOrders', (req, res) => {
 
 // retrieve filter options
 app.get('/api/filterOptions', (req, res) => {
-    // Define the SQL queries
+    // Define the updated SQL queries
     const queries = {
-        status: 'SELECT name AS status FROM status;',
-        category: 'SELECT DISTINCT category_group AS category FROM product_category;',
-        customerName: 'SELECT DISTINCT name AS customerName FROM customer;',
-        country: 'SELECT DISTINCT name AS country FROM country;'
+        statusCountryCustomer: 'SELECT DISTINCT status, country, customer_name FROM sales_order;',
+        category: 'SELECT DISTINCT category_group AS category FROM product_category;'
     };
 
     // Execute queries
@@ -74,25 +111,29 @@ app.get('/api/filterOptions', (req, res) => {
                 if (error) {
                     reject(error);
                 } else {
-                    resolve(results.map(row => Object.values(row)[0]));
+                    resolve(results);
                 }
             });
         });
     };
 
-    // Fetch all filter options
+    // Fetch filter options
     Promise.all([
-        executeQuery(queries.status),
-        executeQuery(queries.category),
-        executeQuery(queries.customerName),
-        executeQuery(queries.country)
+        executeQuery(queries.statusCountryCustomer),
+        executeQuery(queries.category)
     ])
-        .then(([status, category, customerName, country]) => {
+        .then(([statusCountryCustomerResults, categoryResults]) => {
+            // Extract status, country, and customer_name from the results
+            const status = [...new Set(statusCountryCustomerResults.map(row => row.status))];
+            const country = [...new Set(statusCountryCustomerResults.map(row => row.country))];
+            const customerName = [...new Set(statusCountryCustomerResults.map(row => row.customer_name))];
+            const category = categoryResults.map(row => row.category);
+
             res.status(200).json({
                 status,
-                category,
+                country,
                 customerName,
-                country
+                category
             });
         })
         .catch(error => {
@@ -101,111 +142,8 @@ app.get('/api/filterOptions', (req, res) => {
         });
 });
 
-// add a new sales order
-app.post('/api/salesOrders', (req, res) => {
-    const { customerName, status, category, country, createdDate } = req.body;
 
-    // Find or insert the related entities (customer, status, country, product category)
-    const getOrInsertCustomer = `INSERT INTO customer (name) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id);`;
-    const getOrInsertStatus = `INSERT INTO status (name) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id);`;
-    const getOrInsertCountry = `INSERT INTO country (name) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id);`;
-    const getOrInsertCategory = `INSERT INTO product_category (name, category_group) VALUES (?, ?) ON DUPLICATE KEY UPDATE object_id=LAST_INSERT_ID(object_id);`;
 
-    // Sales order insertion query
-    const insertSalesOrder = `
-        INSERT INTO sales_order (customer_id, status_id, country_id, category_id, created_date)
-        VALUES (?, ?, ?, ?, ?);
-    `;
-
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error getting database connection');
-            return;
-        }
-
-        connection.beginTransaction(async (err) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('Error starting transaction');
-                connection.release();
-                return;
-            }
-
-            try {
-                // Insert or find customer
-                const customerResult = await new Promise((resolve, reject) => {
-                    connection.query(getOrInsertCustomer, [customerName], (error, results) => {
-                        if (error) reject(error);
-                        else resolve(results);
-                    });
-                });
-
-                // Insert or find status
-                const statusResult = await new Promise((resolve, reject) => {
-                    connection.query(getOrInsertStatus, [status], (error, results) => {
-                        if (error) reject(error);
-                        else resolve(results);
-                    });
-                });
-
-                // Insert or find country
-                const countryResult = await new Promise((resolve, reject) => {
-                    connection.query(getOrInsertCountry, [country], (error, results) => {
-                        if (error) reject(error);
-                        else resolve(results);
-                    });
-                });
-
-                // Insert or find category
-                const categoryResult = await new Promise((resolve, reject) => {
-                    connection.query(getOrInsertCategory, [category, 'default'], (error, results) => {
-                        if (error) reject(error);
-                        else resolve(results);
-                    });
-                });
-
-                // Insert sales order
-                const salesOrderResult = await new Promise((resolve, reject) => {
-                    connection.query(
-                        insertSalesOrder,
-                        [
-                            customerResult.insertId,
-                            statusResult.insertId,
-                            countryResult.insertId,
-                            categoryResult.insertId,
-                            createdDate,
-                        ],
-                        (error, results) => {
-                            if (error) reject(error);
-                            else resolve(results);
-                        }
-                    );
-                });
-
-                connection.commit((err) => {
-                    if (err) {
-                        console.error('Error committing transaction:', err);
-                        connection.rollback(() => {
-                            connection.release();
-                            res.status(500).send('Error saving sales order');
-                        });
-                        return;
-                    }
-
-                    connection.release();
-                    res.status(201).send('Sales order added successfully');
-                });
-            } catch (error) {
-                console.error('Transaction error:', error);
-                connection.rollback(() => {
-                    connection.release();
-                    res.status(500).send('Error adding sales order');
-                });
-            }
-        });
-    });
-});
 
 var server = app.listen(port, function () {
     console.log(`Express App running at http://127.0.0.1:${port}/`);

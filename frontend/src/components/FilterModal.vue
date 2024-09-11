@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch, onMounted } from 'vue'
-import type { CreatedDateRange, Filteration } from '@/typings/Filteration'
-import type { FilterOptions } from '@/typings/FilterOptions'
+import { defineProps, defineEmits, ref, watch, onMounted } from 'vue';
+import type { CreatedDateRange, Filteration } from '@/typings/Filteration';
+import type { FilterOptions } from '@/typings/FilterOptions';
 
 const {
   onModalClosed,
@@ -9,54 +9,54 @@ const {
     status: [],
     category: [],
     customerName: [],
-    country: []
+    country: [],
   },
-  applyFilter
+  applyFilter,
 } = defineProps<{
-  isOpen: boolean
-  onModalClosed: () => void
-  filterOptions: FilterOptions
-  applyFilter?: (filters: Filteration) => void
-}>()
+  isOpen: boolean;
+  onModalClosed: () => void;
+  filterOptions: FilterOptions;
+  applyFilter?: (filters: Filteration) => void;
+}>();
 
-const emit = defineEmits(['modal-close'])
+const emit = defineEmits(['modal-close']);
 
 const createdDateRange = ref<CreatedDateRange>({
   from: '',
-  to: ''
-})
-const selectedCustomerName = ref('')
-const selectedStatuses = ref<string[]>(['All'])
-const selectedCategories = ref<string[]>(['All'])
-const selectedCountry = ref('')
+  to: '',
+});
+const selectedCustomerName = ref('');
+const selectedStatuses = ref<string[]>(['All']);
+const selectedCategories = ref<string[]>(['All']);
+const selectedCountry = ref('');
 
 // load filters from session storage
 const loadFiltersFromSessionStorage = () => {
   try {
-    const savedFilters = sessionStorage.getItem('filters')
+    const savedFilters = sessionStorage.getItem('filters');
     if (savedFilters) {
       const {
         createdDateRange: savedDateRange,
         customerName: savedCustomerName,
         status: savedStatuses,
         category: savedCategories,
-        country: savedCountry
-      } = JSON.parse(savedFilters)
-      createdDateRange.value = savedDateRange
-      selectedCustomerName.value = savedCustomerName
-      selectedStatuses.value = savedStatuses
-      selectedCategories.value = savedCategories
-      selectedCountry.value = savedCountry
+        country: savedCountry,
+      } = JSON.parse(savedFilters);
+      createdDateRange.value = savedDateRange;
+      selectedCustomerName.value = savedCustomerName;
+      selectedStatuses.value = savedStatuses;
+      selectedCategories.value = savedCategories;
+      selectedCountry.value = savedCountry;
     }
   } catch (error) {
-    console.error('Error loading filters from sessionStorage: ', error)
+    console.error('Error loading filters from sessionStorage: ', error);
   }
-}
+};
 
 // load filters when the component is mounted
 onMounted(() => {
-  loadFiltersFromSessionStorage()
-})
+  loadFiltersFromSessionStorage();
+});
 
 const closeModal = () => {
   const isStateChanged =
@@ -65,38 +65,38 @@ const closeModal = () => {
     selectedCustomerName.value !== '' ||
     selectedStatuses.value.length > 0 ||
     selectedCategories.value.length > 0 ||
-    selectedCountry.value !== ''
+    selectedCountry.value !== '';
 
   if (isStateChanged) {
     const confirmed = window.confirm(
-      'Closing this modal will discard any filter selections you have made. Are you sure you want to close it?'
-    )
+      'Closing this modal will discard any filter selections you have made. Are you sure you want to close it?',
+    );
 
     if (confirmed) {
       // User clicked "OK"
-      onModalClosed()
+      onModalClosed();
     }
   } else {
-    onModalClosed()
+    onModalClosed();
   }
-}
+};
 
 const toggleAllStatuses = () => {
   if (selectedStatuses.value.includes('All')) {
-    selectedStatuses.value = ['All']
+    selectedStatuses.value = ['All'];
   } else if (selectedStatuses.value.length === 0) {
-    selectedStatuses.value = []
+    selectedStatuses.value = [];
   }
-}
+};
 
 // Handle selecting/deselecting "All" category
 const toggleAllCategories = () => {
   if (selectedCategories.value.includes('All')) {
-    selectedCategories.value = ['All']
+    selectedCategories.value = ['All'];
   } else if (selectedCategories.value.length === 0) {
-    selectedCategories.value = []
+    selectedCategories.value = [];
   }
-}
+};
 
 const handleSubmit = () => {
   const filteration = {
@@ -104,29 +104,29 @@ const handleSubmit = () => {
     customerName: selectedCustomerName.value,
     status: selectedStatuses.value,
     category: selectedCategories.value,
-    country: selectedCountry.value
-  }
+    country: selectedCountry.value,
+  };
 
   try {
     // save the filteration object to sessionStorage
-    sessionStorage.setItem('filters', JSON.stringify(filteration))
+    sessionStorage.setItem('filters', JSON.stringify(filteration));
   } catch (error) {
     // handle any errors that occur during saving
-    console.error('Error saving filters to sessionStorage: ', error)
+    console.error('Error saving filters to sessionStorage: ', error);
   }
 
-  applyFilter?.(filteration)
+  applyFilter?.(filteration);
 
-  onModalClosed()
-}
+  onModalClosed();
+};
 
 const handleReset = () => {
-  Object.assign(createdDateRange.value, { from: '', to: '' })
-  selectedCustomerName.value = ''
-  selectedStatuses.value = []
-  selectedCategories.value = []
-  selectedCountry.value = ''
-}
+  Object.assign(createdDateRange.value, { from: '', to: '' });
+  selectedCustomerName.value = '';
+  selectedStatuses.value = [];
+  selectedCategories.value = [];
+  selectedCountry.value = '';
+};
 </script>
 
 <template>
@@ -162,7 +162,9 @@ const handleReset = () => {
 
             <!-- Customer Name -->
             <div class="filter-row">
-              <label for="customer-name" class="filter-label">Customer Name</label>
+              <label for="customer-name" class="filter-label"
+                >Customer Name</label
+              >
               <select id="customer-name" v-model="selectedCustomerName">
                 <option value="">Select Customer Name</option>
                 <option
@@ -192,7 +194,11 @@ const handleReset = () => {
                 </div>
 
                 <!-- Other status options -->
-                <div class="filter-checkbox" v-for="status in filterOptions.status" :key="status">
+                <div
+                  class="filter-checkbox"
+                  v-for="status in filterOptions.status"
+                  :key="status"
+                >
                   <input
                     type="checkbox"
                     :id="`status-${status}`"
@@ -242,7 +248,11 @@ const handleReset = () => {
               <label for="country" class="filter-label">Country</label>
               <select id="country" v-model="selectedCountry">
                 <option value="">Select Country</option>
-                <option v-for="country in filterOptions.country" :key="country" :value="country">
+                <option
+                  v-for="country in filterOptions.country"
+                  :key="country"
+                  :value="country"
+                >
                   {{ country }}
                 </option>
               </select>
@@ -250,10 +260,14 @@ const handleReset = () => {
 
             <!-- Buttons -->
             <div class="filter-row">
-              <button type="button" @click="handleReset" class="reset-btn">Reset</button>
+              <button type="button" @click="handleReset" class="reset-btn">
+                Reset
+              </button>
               <div class="right-button-container">
                 <button type="submit" class="apply-btn">Apply</button>
-                <button type="button" @click="closeModal" class="close-btn">Close</button>
+                <button type="button" @click="closeModal" class="close-btn">
+                  Close
+                </button>
               </div>
             </div>
           </form>
