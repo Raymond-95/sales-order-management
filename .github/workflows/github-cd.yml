@@ -24,7 +24,16 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ./sales-order-management
-            git pull
-            docker-compose down
-            docker-compose up --build
+            docker pull raymondlwy/sales-order-management-frontend:latest
+            docker pull raymondlwy/sales-order-management-backend:latest
+
+            # Run the frontend container
+            docker run --name frontend \
+              --env-file .env.production \
+              -p 8080:80 \
+              -d raymondlwy/sales-order-management-frontend:latest
+
+            # Run the backend container
+            docker run --name backend \
+              -p 3000:3000 \
+              -d raymondlwy/sales-order-management-backend:latest
