@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import SortImage from '../assets/sort.png';
 import DotsImage from '../assets/dots.png';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const router = useRouter();
 
 const { headers, dataList } = defineProps<Props>();
 const sortedDataList = ref<SalesOrder[]>([...dataList] || []);
@@ -78,9 +80,13 @@ watch(
 );
 
 // Implement handlers for edit and delete actions
-const handleEdit = (row: Record<string, any>) => {
-  console.log('Edit:', row);
-  // Implement your edit logic here
+const handleEdit = (row: SalesOrder) => {
+  router.push({
+    name: 'EditSalesOrder',
+    query: {
+      salesOrder: encodeURIComponent(JSON.stringify(row)),
+    },
+  });
 };
 
 const handleDelete = async (row: SalesOrder) => {

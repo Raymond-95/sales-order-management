@@ -1,27 +1,35 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
-import { useEnumOptions } from '@/hooks/useEnumOptions';
+import { useEnumOptions } from '@/hooks/useEnumOptions'; // Import the composable
+import type { SalesOrder } from '@/typings/SalesOrder';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+// Accept props from parent component
+const { salesOrder } = defineProps<{
+  salesOrder: SalesOrder;
+  statuses: string[];
+  categories: string[];
+  countries: string[];
+}>();
 
 const router = useRouter();
+const route = useRoute();
 
-// Define the form state
-const form = ref({
-  customerName: '',
-  status: '',
-  category: '',
-  country: '',
-});
-
-// Use the composable to get enum options
+// Destructure enum options from the composable
 const { statuses, categories, countries, fetchEnumOptions } = useEnumOptions();
 
 // Call the API to fetch enum options when the component is mounted
 onMounted(() => {
   fetchEnumOptions();
+});
+
+// Create form based on the salesOrder prop
+const form = ref({
+  customerName: salesOrder.customerName || '',
+  status: salesOrder.status || '',
+  category: salesOrder.category || '',
+  country: salesOrder.country || '',
 });
 
 // Validation for each field
@@ -45,38 +53,35 @@ const validateForm = () => {
   return true;
 };
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 // Handle form submission
 const submitForm = async () => {
   if (!validateForm()) {
     return;
   }
 
+  const salesOrderId = salesOrder.orderId;
+
   try {
-    await axios.post(`${apiBaseUrl}/salesOrders`, form.value, {
+    await axios.put(`${apiBaseUrl}/salesOrders/${salesOrderId}`, form.value, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    alert('Sales order added successfully');
-    form.value = {
-      customerName: '',
-      status: '',
-      category: '',
-      country: '',
-    };
-
+    alert('Sales order updated successfully');
     router.push({ name: 'Home' });
   } catch (error) {
-    console.error('Error adding sales order:', error);
-    alert('Error adding sales order');
+    console.error('Error updating sales order:', error);
+    alert('Error updating sales order');
   }
 };
 </script>
 
 <template>
-  <div class="add-sales-order">
-    <h1>Add Sales Order</h1>
+  <div class="edit-sales-order">
+    <h1>Edit Sales Order</h1>
     <form @submit.prevent="submitForm">
       <div class="form-group">
         <label for="customer-name">
@@ -130,13 +135,13 @@ const submitForm = async () => {
         </select>
       </div>
 
-      <button type="submit">Add Customer</button>
+      <button type="submit">Update Sales Order</button>
     </form>
   </div>
 </template>
 
 <style scoped>
-.add-sales-order {
+.edit-sales-order {
   max-width: 500px;
   margin: auto;
   padding: 20px;

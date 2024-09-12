@@ -1,6 +1,4 @@
-export interface FilterOptions {
-  status: string[]
-  category: string[]
-  customerName: string[]
-  country: string[]
+import type { EnumOptions } from './EnumOptions';
+export interface FilterOptions extends EnumOptions {
+  customerName: string[];
 }
