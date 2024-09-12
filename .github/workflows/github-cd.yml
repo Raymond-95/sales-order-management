@@ -24,5 +24,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull my-docker-image:latest
+            docker pull raymondlwy/sales-order-management-frontend:latest
+            docker pull raymondlwy/sales-order-management-backend:latest
             docker-compose -f docker-compose.yml up -d
