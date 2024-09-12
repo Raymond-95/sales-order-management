@@ -2,7 +2,7 @@
 FROM node:18 AS build
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -13,9 +13,6 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Copy the .env file into the Docker image
-COPY .env ../
-
 # Build the Vue app
 RUN npm run build
 
@@ -23,7 +20,9 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy the build artifacts from the previous stage
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
+
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 # Expose the port for the web server
 EXPOSE 80

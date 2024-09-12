@@ -316,5 +316,5 @@ app.put('/api/salesOrders/:id', (req, res) => {
 });
 
 var server = app.listen(port, function () {
-    console.log(`Express App running at http://127.0.0.1:${port}/`);
+    console.log(`Express App is running`);
 })
