@@ -29,7 +29,7 @@ jobs:
       - name: Build Docker images
         run: |
           # Build and push frontend Docker image
-          docker buildx build --file frontend/Dockerfile --tag frontend-image:latest --push ./frontend
+          docker buildx build --file frontend/Dockerfile --tag raymondlwy/sales-order-management-frontend::latest --push ./frontend
 
           # Build and push backend Docker image
-          docker buildx build --file backend/Dockerfile --tag backend-image:latest --push ./backend
+          docker buildx build --file backend/Dockerfile --tag raymondlwy/sales-order-management-backend::latest --push ./backend
