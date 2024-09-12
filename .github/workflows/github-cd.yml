@@ -2,9 +2,10 @@
 name: Gihub CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ['Gihub CI Pipeline']
+    types:
+      - completed
 
 jobs:
   deploy:
