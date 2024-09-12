@@ -62,7 +62,7 @@ app.get('/api/getEnums', (req, res) => {
 // retrieve sales order list
 app.get('/api/salesOrders', (req, res) => {
     const query = `
-        SELECT so.object_id AS orderId,
+        SELECT so.id AS orderId,
                so.customer_name AS customerName,
                so.status AS status,
                so.country AS country,
@@ -70,7 +70,7 @@ app.get('/api/salesOrders', (req, res) => {
                pc.category_group AS categoryGroup,
                so.created_date AS createdDate
         FROM sales_order so
-        JOIN product_category pc ON so.category_id = pc.object_id;
+        JOIN product_category pc ON so.category_id = pc.id;
     `;
 
     pool.query(query, (error, results) => {
@@ -142,8 +142,125 @@ app.get('/api/filterOptions', (req, res) => {
         });
 });
 
+// retrieve enum options (status, category, and country)
+app.get('/api/getEnum', (req, res) => {
+    // Define the SQL queries
+    const queries = {
+        statusCountry: 'SELECT DISTINCT status, country FROM sales_order;',
+        category: 'SELECT DISTINCT name AS category FROM product_category;'
+    };
 
+    // Execute queries
+    const executeQuery = (query) => {
+        return new Promise((resolve, reject) => {
+            pool.query(query, (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+    };
 
+    // Fetch enum options
+    Promise.all([
+        executeQuery(queries.statusCountry),
+        executeQuery(queries.category)
+    ])
+        .then(([statusCountryResults, categoryResults]) => {
+            // Extract status and country from the results
+            const status = [...new Set(statusCountryResults.map(row => row.status))];
+            const country = [...new Set(statusCountryResults.map(row => row.country))];
+            const category = categoryResults.map(row => row.category);
+
+            res.status(200).json({
+                status,
+                country,
+                category
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).send('Error retrieving enum options');
+        });
+});
+
+// add a sales order
+app.post('/api/salesOrders', (req, res) => {
+    const { customerName, status, category, country } = req.body;
+
+    if (!customerName || !status || !category || !country) {
+        return res.status(400).send('Missing required fields');
+    }
+
+    // find the category_id from the product_category table
+    const categoryQuery = `
+        SELECT id FROM product_category WHERE name = ?
+    `;
+
+    // execute the category query
+    pool.query(categoryQuery, [category], (error, categoryResults) => {
+        if (error) {
+            console.error('Error fetching category:', error);
+            return res.status(500).send('Error fetching category');
+        }
+
+        if (categoryResults.length === 0) {
+            return res.status(404).send('Category not found');
+        }
+
+        const categoryId = categoryResults[0].id;
+
+        // define the SQL query for inserting the sales order
+        const insertQuery = `
+            INSERT INTO sales_order (customer_name, status, category_id, country, created_date)
+            VALUES (?, ?, ?, ?, NOW());
+        `;
+
+        // execute the insert query
+        pool.query(insertQuery, [customerName, status, categoryId, country], (error, results) => {
+            if (error) {
+                console.error('Error inserting sales order:', error);
+                return res.status(500).send('Error inserting sales order');
+            }
+
+            res.status(201).send({ message: 'Sales order added successfully', orderId: results.insertId });
+        });
+    });
+});
+
+// delete sales order by ID
+app.delete('/api/salesOrders/:id', (req, res) => {
+    console.log(req.params)
+    const orderId = req.params.id;
+
+    // Check if id is provided
+    if (!orderId) {
+        return res.status(400).send('Sales order ID is required');
+    }
+
+    // SQL query to delete a sales order by id
+    const query = `
+        DELETE FROM sales_order 
+        WHERE id = ?
+    `;
+
+    // Execute the query
+    pool.query(query, [orderId], (error, results) => {
+        if (error) {
+            console.error('Error deleting sales order:', error);
+            return res.status(500).send('Error deleting sales order');
+        }
+
+        // If no rows were affected, the sales order ID does not exist
+        if (results.affectedRows === 0) {
+            return res.status(404).send('Sales order not found');
+        }
+
+        res.status(200).send({ message: 'Sales order deleted successfully' });
+    });
+});
 
 var server = app.listen(port, function () {
     console.log(`Express App running at http://127.0.0.1:${port}/`);

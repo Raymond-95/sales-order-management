@@ -1,54 +1,143 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios'; // Import axios
 
+const router = useRouter();
+
+// Define the form state
 const form = ref({
   customerName: '',
   status: '',
   category: '',
-  country: ''
-})
+  country: '',
+});
 
-// Example options, you might fetch these from an API or define them elsewhere
-const statuses = ref(['Active', 'Inactive', 'Pending'])
-const categories = ref(['Category 1', 'Category 2', 'Category 3'])
-const countries = ref(['USA', 'Canada', 'UK'])
+// Initialize empty options for the select fields
+const statuses = ref<string[]>([]);
+const categories = ref<string[]>([]);
+const countries = ref<string[]>([]);
 
-const submitForm = () => {
-  // Handle form submission
-  console.log('Form Submitted:', form.value)
-  // You might send this data to an API or handle it as needed
-}
+// Fetch the enum options from the API
+const fetchEnumOptions = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:3000/api/getEnum');
+    const data = response.data;
+
+    // Populate the options with the data from the API
+    statuses.value = data.status;
+    categories.value = data.category;
+    countries.value = data.country;
+  } catch (error) {
+    console.error('Error fetching enum options:', error);
+  }
+};
+
+// Call the API when the component is mounted
+onMounted(() => {
+  fetchEnumOptions();
+});
+
+// Validation for each field
+const validateForm = () => {
+  if (!form.value.customerName) {
+    alert('Customer name is required');
+    return false;
+  }
+  if (!form.value.status) {
+    alert('Status is required');
+    return false;
+  }
+  if (!form.value.category) {
+    alert('Category is required');
+    return false;
+  }
+  if (!form.value.country) {
+    alert('Country is required');
+    return false;
+  }
+  return true;
+};
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+// handle form submission
+const submitForm = async () => {
+  if (!validateForm()) {
+    return;
+  }
+
+  try {
+    await axios.post(`${apiBaseUrl}/salesOrders`, form.value, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    alert('Sales order added successfully');
+    form.value = {
+      customerName: '',
+      status: '',
+      category: '',
+      country: '',
+    };
+
+    router.push({ name: 'Home' });
+  } catch (error) {
+    console.error('Error adding sales order:', error);
+    alert('Error adding sales order');
+  }
+};
 </script>
 
 <template>
-  <div class="add-customer">
-    <h1>Add Customer</h1>
+  <div class="add-sales-order">
+    <h1>Add Sales Order</h1>
     <form @submit.prevent="submitForm">
       <div class="form-group">
-        <label for="customer-name">Customer Name:</label>
-        <input id="customer-name" v-model="form.customerName" type="text" required />
+        <label for="customer-name">
+          Customer Name: <span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="customer-name"
+          v-model="form.customerName"
+          type="text"
+          required
+        />
       </div>
 
       <div class="form-group">
-        <label for="status">Status:</label>
+        <label for="status">
+          Status: <span class="required-asterisk">*</span>
+        </label>
         <select id="status" v-model="form.status" required>
           <option value="">Select Status</option>
-          <option v-for="status in statuses" :key="status" :value="status">{{ status }}</option>
+          <option v-for="status in statuses" :key="status" :value="status">
+            {{ status }}
+          </option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="category">Category:</label>
+        <label for="category">
+          Category: <span class="required-asterisk">*</span>
+        </label>
         <select id="category" v-model="form.category" required>
           <option value="">Select Category</option>
-          <option v-for="category in categories" :key="category" :value="category">
+          <option
+            v-for="category in categories"
+            :key="category"
+            :value="category"
+          >
             {{ category }}
           </option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="country">Country:</label>
+        <label for="country">
+          Country: <span class="required-asterisk">*</span>
+        </label>
         <select id="country" v-model="form.country" required>
           <option value="">Select Country</option>
           <option v-for="country in countries" :key="country" :value="country">
@@ -63,7 +152,7 @@ const submitForm = () => {
 </template>
 
 <style scoped>
-.add-customer {
+.add-sales-order {
   max-width: 500px;
   margin: auto;
   padding: 20px;
@@ -99,5 +188,9 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.required-asterisk {
+  color: red;
 }
 </style>
