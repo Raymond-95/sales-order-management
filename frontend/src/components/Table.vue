@@ -103,8 +103,6 @@ const handleDelete = async (row: SalesOrder) => {
     sortedDataList.value = sortedDataList.value.filter(
       (item) => item.orderId !== row.orderId,
     );
-
-    console.log(`Deleted order ID: ${row.orderId}`);
   } catch (error) {
     console.error('Error deleting the sales order:', error);
     alert('Failed to delete the sales order');

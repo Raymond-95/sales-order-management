@@ -11,9 +11,9 @@ app.use(bodyParser.json());
 // create the MySQL connection pool
 const pool = mysql.createPool({
     connectionLimit: 10,
-    host: 'localhost',
-    user: 'root',
-    password: '',
+    host: 'db',
+    user: 'devUser',
+    password: 'devUser',
     database: 'vuetest'
 });
 
@@ -236,7 +236,6 @@ app.post('/api/salesOrders', (req, res) => {
 
 // delete sales order by ID
 app.delete('/api/salesOrders/:id', (req, res) => {
-    console.log(req.params)
     const orderId = req.params.id;
 
     // Check if id is provided
@@ -315,7 +314,6 @@ app.put('/api/salesOrders/:id', (req, res) => {
         });
     });
 });
-
 
 var server = app.listen(port, function () {
     console.log(`Express App running at http://127.0.0.1:${port}/`);

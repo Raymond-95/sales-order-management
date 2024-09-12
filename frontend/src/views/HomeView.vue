@@ -47,6 +47,7 @@ const fetchSalesOrders = async () => {
     const response = await axios.get(`${apiBaseUrl}/salesOrders`);
 
     initialSalesOrderList.value = response.data;
+    salesOrderList.value = response.data;
 
     tableHeaders.value = Object.keys(initialSalesOrderList.value[0]).filter(
       (header) => header !== 'categoryGroup',
