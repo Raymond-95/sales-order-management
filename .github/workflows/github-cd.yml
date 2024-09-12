@@ -24,6 +24,11 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Drop the process
+            docker stop frontend && docker rm frontend
+            docker stop backend && docker rm backend
+
+            # Pull container images
             docker pull raymondlwy/sales-order-management-frontend:latest
             docker pull raymondlwy/sales-order-management-backend:latest
 
