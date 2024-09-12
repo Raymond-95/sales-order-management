@@ -91,7 +91,11 @@ app.get('/api/salesOrders', (req, res) => {
                     createdDate: formattedDate,
                 };
             });
-            res.status(200).json(response);
+
+            // default: sort the response by order id
+            const sortedResponse = response.sort((a, b) => a.orderId - b.orderId)
+
+            res.status(200).json(sortedResponse);
         }
     });
 });
