@@ -262,6 +262,57 @@ app.delete('/api/salesOrders/:id', (req, res) => {
     });
 });
 
+// Edit a sales order
+app.put('/api/salesOrders/:id', (req, res) => {
+    const { id } = req.params;
+    const { customerName, status, category, country } = req.body;
+
+    // Validation
+    if (!customerName || !status || !category || !country) {
+        return res.status(400).send('Missing required fields');
+    }
+
+    // Find the category_id from the product_category table
+    const categoryQuery = `
+        SELECT id FROM product_category WHERE name = ?
+    `;
+
+    pool.query(categoryQuery, [category], (error, categoryResults) => {
+        if (error) {
+            console.error('Error fetching category:', error);
+            return res.status(500).send('Error fetching category');
+        }
+
+        if (categoryResults.length === 0) {
+            return res.status(404).send('Category not found');
+        }
+
+        const categoryId = categoryResults[0].id;
+
+        // Define the SQL query for updating the sales order
+        const updateQuery = `
+            UPDATE sales_order
+            SET customer_name = ?, status = ?, category_id = ?, country = ?, updated_date = NOW()
+            WHERE id = ?;
+        `;
+
+        // Execute the update query
+        pool.query(updateQuery, [customerName, status, categoryId, country, id], (error, results) => {
+            if (error) {
+                console.error('Error updating sales order:', error);
+                return res.status(500).send('Error updating sales order');
+            }
+
+            if (results.affectedRows === 0) {
+                return res.status(404).send('Sales order not found');
+            }
+
+            res.status(200).send({ message: 'Sales order updated successfully' });
+        });
+    });
+});
+
+
 var server = app.listen(port, function () {
     console.log(`Express App running at http://127.0.0.1:${port}/`);
 })
