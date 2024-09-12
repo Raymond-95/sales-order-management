@@ -26,4 +26,4 @@ jobs:
           script: |
             docker pull raymondlwy/sales-order-management-frontend:latest
             docker pull raymondlwy/sales-order-management-backend:latest
-            docker-compose -f docker-compose.yml up -d
+            docker-compose -f ../../docker-compose.yml up -d
