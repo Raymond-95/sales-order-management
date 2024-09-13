@@ -11,46 +11,6 @@ app.use(bodyParser.json());
 
 app.use('/api', routes);
 
-// retrieve sales order list
-app.get('/api/salesOrders', (req, res) => {
-    const query = `
-        SELECT so.id AS orderId,
-               so.customer_name AS customerName,
-               so.status AS status,
-               so.country AS country,
-               pc.name AS category,
-               pc.category_group AS categoryGroup,
-               so.created_date AS createdDate
-        FROM sales_order so
-        JOIN product_category pc ON so.category_id = pc.id;
-    `;
-
-    dbConnectionPool.query(query, (error, results) => {
-        if (error) {
-            res.status(500).send(error);
-        } else {
-            const response = results.map((result) => {
-                const formattedDate = new Date(result.createdDate).toISOString().split('T')[0];
-
-                return {
-                    orderId: result.orderId,
-                    customerName: result.customerName,
-                    status: result.status,
-                    category: result.category,
-                    categoryGroup: result.categoryGroup,
-                    country: result.country,
-                    createdDate: formattedDate,
-                };
-            });
-
-            // default: sort the response by order id
-            const sortedResponse = response.sort((a, b) => a.orderId - b.orderId)
-
-            res.status(200).json(sortedResponse);
-        }
-    });
-});
-
 // retrieve filter options
 app.get('/api/filterOptions', (req, res) => {
     // Define the updated SQL queries
