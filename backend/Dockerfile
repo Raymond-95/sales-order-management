@@ -16,7 +16,7 @@ COPY . .
 ARG ENV=dev
 
 # Set environment variables
-ENV DATABASE_URL=mysql://devUser:devUser@db:3306/vuetest
+ENV DATABASE_URL=mysql://devUser:devUser@43.216.253.168:3306/vuetest
 
 EXPOSE 3000
 
