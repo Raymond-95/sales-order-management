@@ -18,7 +18,9 @@ EXPOSE 3000
 
 # Set environment variable default value
 ARG ENV=prod
-ENV ENV=${ENV}
 
-# Use the entry point script to determine the command to run
-ENTRYPOINT ["/app/entrypoint.sh"]
+RUN if [ "$ENV" = "dev" ]; then npm run dev; else npm run ${ENV}; fi
+# ENV ENV=${ENV}
+
+# # Use the entry point script to determine the command to run
+# ENTRYPOINT ["/app/entrypoint.sh"]
