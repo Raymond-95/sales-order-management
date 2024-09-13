@@ -1,30 +1,17 @@
 var express = require('express');
-const dotenv = require('dotenv');
+const loadEnv = require('./config/envConfig');
+const createDBConnectionPool = require('./db/db');
 const bodyParser = require('body-parser');
-var mysql = require('mysql');
+
+loadEnv();
 
 var app = express();
 const port = 3000;
 
-// override with .env.production if NODE_ENV is set to 'production'
-if (process.env.NODE_ENV === 'production') {
-    dotenv.config({ path: '.env.production' });
-}
-else {
-    dotenv.config();
-}
+const dbConnectionPool = createDBConnectionPool();
 
 // parse the requests of content-type 'application/json'
 app.use(bodyParser.json());
-
-// create the MySQL connection pool
-const pool = mysql.createPool({
-    connectionLimit: 10,
-    host: process.env.DATABSE_HOSTNAME,
-    user: 'devUser',
-    password: 'devUser',
-    database: 'vuetest'
-});
 
 // retrieve enum options (status, category, country)
 app.get('/api/getEnums', (req, res) => {
@@ -38,7 +25,7 @@ app.get('/api/getEnums', (req, res) => {
     // Helper function to execute a SQL query
     const executeQuery = (query) => {
         return new Promise((resolve, reject) => {
-            pool.query(query, (error, results) => {
+            dbConnectionPool.query(query, (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -82,7 +69,7 @@ app.get('/api/salesOrders', (req, res) => {
         JOIN product_category pc ON so.category_id = pc.id;
     `;
 
-    pool.query(query, (error, results) => {
+    dbConnectionPool.query(query, (error, results) => {
         if (error) {
             res.status(500).send(error);
         } else {
@@ -119,7 +106,7 @@ app.get('/api/filterOptions', (req, res) => {
     // Execute queries
     const executeQuery = (query) => {
         return new Promise((resolve, reject) => {
-            pool.query(query, (error, results) => {
+            dbConnectionPool.query(query, (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -164,7 +151,7 @@ app.get('/api/getEnum', (req, res) => {
     // Execute queries
     const executeQuery = (query) => {
         return new Promise((resolve, reject) => {
-            pool.query(query, (error, results) => {
+            dbConnectionPool.query(query, (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -210,7 +197,7 @@ app.post('/api/salesOrders', (req, res) => {
     `;
 
     // execute the category query
-    pool.query(categoryQuery, [category], (error, categoryResults) => {
+    dbConnectionPool.query(categoryQuery, [category], (error, categoryResults) => {
         if (error) {
             console.error('Error fetching category:', error);
             return res.status(500).send('Error fetching category');
@@ -229,7 +216,7 @@ app.post('/api/salesOrders', (req, res) => {
         `;
 
         // execute the insert query
-        pool.query(insertQuery, [customerName, status, categoryId, country], (error, results) => {
+        dbConnectionPool.query(insertQuery, [customerName, status, categoryId, country], (error, results) => {
             if (error) {
                 console.error('Error inserting sales order:', error);
                 return res.status(500).send('Error inserting sales order');
@@ -256,7 +243,7 @@ app.delete('/api/salesOrders/:id', (req, res) => {
     `;
 
     // Execute the query
-    pool.query(query, [orderId], (error, results) => {
+    dbConnectionPool.query(query, [orderId], (error, results) => {
         if (error) {
             console.error('Error deleting sales order:', error);
             return res.status(500).send('Error deleting sales order');
@@ -286,7 +273,7 @@ app.put('/api/salesOrders/:id', (req, res) => {
         SELECT id FROM product_category WHERE name = ?
     `;
 
-    pool.query(categoryQuery, [category], (error, categoryResults) => {
+    dbConnectionPool.query(categoryQuery, [category], (error, categoryResults) => {
         if (error) {
             console.error('Error fetching category:', error);
             return res.status(500).send('Error fetching category');
@@ -306,7 +293,7 @@ app.put('/api/salesOrders/:id', (req, res) => {
         `;
 
         // Execute the update query
-        pool.query(updateQuery, [customerName, status, categoryId, country, id], (error, results) => {
+        dbConnectionPool.query(updateQuery, [customerName, status, categoryId, country, id], (error, results) => {
             if (error) {
                 console.error('Error updating sales order:', error);
                 return res.status(500).send('Error updating sales order');

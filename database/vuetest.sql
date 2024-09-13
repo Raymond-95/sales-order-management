@@ -1,4 +1,4 @@
-CREATE USER 'devUser'@'db' IDENTIFIED BY 'devUser';
+CREATE USER 'devUser'@'localhost' IDENTIFIED BY 'devUser';
 
 -- create database
 DROP DATABASE IF EXISTS vuetest;
