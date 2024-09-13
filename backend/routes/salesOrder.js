@@ -49,12 +49,9 @@ const addSalesOrder = async (req, res) => {
         return res.status(400).send('Missing required fields');
     }
 
-    // find the category_id from the product_category table
-    const categoryQuery = `
-        SELECT id FROM product_category WHERE name = ?
-    `;
-
     try {
+        const categoryQuery = `SELECT id FROM product_category WHERE name = ?`;
+
         const categoryResults = await executeQuery(categoryQuery, [category]);
 
         if (categoryResults.length === 0) {
@@ -77,7 +74,47 @@ const addSalesOrder = async (req, res) => {
     }
 };
 
+// edit sales order
+const updateSalesOrder = async (req, res) => {
+    const { id } = req.params;
+    const { customerName, status, category, country } = req.body;
+
+    if (!customerName || !status || !category || !country) {
+        return res.status(400).send('Missing required fields');
+    }
+
+    try {
+        const categoryQuery = `SELECT id FROM product_category WHERE name = ?`;
+
+        const categoryResults = await executeQuery(categoryQuery, [category]);
+
+        if (categoryResults.length === 0) {
+            return res.status(404).send('Category not found');
+        }
+
+        const categoryId = categoryResults[0].id;
+
+        const updateQuery = `
+            UPDATE sales_order
+            SET customer_name = ?, status = ?, category_id = ?, country = ?, updated_date = NOW()
+            WHERE id = ?;
+        `;
+
+        const results = await executeQuery(updateQuery, [customerName, status, categoryId, country, id]);
+
+        if (results.affectedRows === 0) {
+            return res.status(404).send('Sales order not found');
+        }
+
+        return res.status(200).send({ message: 'Sales order updated successfully' });
+    } catch (error) {
+        console.error('Error updating sales order:', error);
+        return res.status(500).send('Error updating sales order');
+    }
+};
+
 module.exports = {
     getSalesOrders,
-    addSalesOrder
+    addSalesOrder,
+    updateSalesOrder
 }
