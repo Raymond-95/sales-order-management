@@ -11,7 +11,7 @@ export function useEnumOptions() {
 
   const fetchEnumOptions = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}/getEnum`);
+      const response = await axios.get(`${apiBaseUrl}/getEnums`);
       const data: EnumOptions = response.data;
       statuses.value = data.status;
       categories.value = data.category;
