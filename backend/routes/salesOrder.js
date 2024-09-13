@@ -102,6 +102,7 @@ const updateSalesOrder = async (req, res) => {
 
         const results = await executeQuery(updateQuery, [customerName, status, categoryId, country, id]);
 
+        // if no rows were affected, the sales order ID does not exist
         if (results.affectedRows === 0) {
             return res.status(404).send('Sales order not found');
         }
@@ -113,8 +114,35 @@ const updateSalesOrder = async (req, res) => {
     }
 };
 
+// delete sales order by ID
+const deleteSalesOrder = async (req, res) => {
+    const orderId = req.params.id;
+
+    // Check if id is provided
+    if (!orderId) {
+        return res.status(400).send('Sales order ID is required');
+    }
+
+    try {
+        const query = `DELETE FROM sales_order WHERE id = ?`;
+
+        const results = executeQuery(query, [orderId]);
+
+        // if no rows were affected, the sales order ID does not exist
+        if (results.affectedRows === 0) {
+            return res.status(404).send('Sales order not found');
+        }
+
+        return res.status(200).send({ message: 'Sales order deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting sales order:', error);
+        return res.status(500).send('Error deleting sales order');
+    }
+};
+
 module.exports = {
     getSalesOrders,
     addSalesOrder,
-    updateSalesOrder
+    updateSalesOrder,
+    deleteSalesOrder
 }
