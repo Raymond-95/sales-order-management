@@ -20,5 +20,7 @@ EXPOSE 3000
 ARG ENV=prod
 ENV ENV=${ENV}
 
+RUN echo "ENV is set to: ${ENV}"
+
 # Use the entry point script to determine the command to run
 ENTRYPOINT ["/app/entrypoint.sh"]
