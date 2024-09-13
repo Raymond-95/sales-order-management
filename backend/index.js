@@ -11,50 +11,6 @@ app.use(bodyParser.json());
 
 app.use('/api', routes);
 
-// add a sales order
-app.post('/api/salesOrders', (req, res) => {
-    const { customerName, status, category, country } = req.body;
-
-    if (!customerName || !status || !category || !country) {
-        return res.status(400).send('Missing required fields');
-    }
-
-    // find the category_id from the product_category table
-    const categoryQuery = `
-        SELECT id FROM product_category WHERE name = ?
-    `;
-
-    // execute the category query
-    dbConnectionPool.query(categoryQuery, [category], (error, categoryResults) => {
-        if (error) {
-            console.error('Error fetching category:', error);
-            return res.status(500).send('Error fetching category');
-        }
-
-        if (categoryResults.length === 0) {
-            return res.status(404).send('Category not found');
-        }
-
-        const categoryId = categoryResults[0].id;
-
-        // define the SQL query for inserting the sales order
-        const insertQuery = `
-            INSERT INTO sales_order (customer_name, status, category_id, country, created_date)
-            VALUES (?, ?, ?, ?, NOW());
-        `;
-
-        // execute the insert query
-        dbConnectionPool.query(insertQuery, [customerName, status, categoryId, country], (error, results) => {
-            if (error) {
-                console.error('Error inserting sales order:', error);
-                return res.status(500).send('Error inserting sales order');
-            }
-
-            res.status(201).send({ message: 'Sales order added successfully', orderId: results.insertId });
-        });
-    });
-});
-
 // delete sales order by ID
 app.delete('/api/salesOrders/:id', (req, res) => {
     const orderId = req.params.id;

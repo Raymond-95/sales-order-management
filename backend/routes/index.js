@@ -2,11 +2,13 @@ var express = require('express')
 var router = express.Router();
 
 const getEnums = require('./enums')
-const getSalesOrder = require('./salesOrder')
+const { getSalesOrders, addSalesOrder } = require('./salesOrder')
 const getFilterOptions = require('./filterOptions')
 
 router.get('/enums', getEnums);
 router.get('/fiterOptions', getFilterOptions);
-router.get('/salesOrder', getSalesOrder);
+
+router.get('/salesOrder', getSalesOrders);
+router.post('/salesOrder', addSalesOrder);
 
 module.exports = router

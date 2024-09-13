@@ -1,8 +1,8 @@
 const dbConnectionPool = require('../db/db')
 
-const executeQuery = (query) => {
+const executeQuery = (query, params) => {
     return new Promise((resolve, reject) => {
-        dbConnectionPool.query(query, (error, results) => {
+        dbConnectionPool.query(query, params, (error, results) => {
             if (error) {
                 reject(error);
             } else {

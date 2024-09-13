@@ -1,7 +1,7 @@
 const executeQuery = require('../utils/queryHelper')
 
 // retrieve sales order list
-const getSalesOrder = async (req, res) => {
+const getSalesOrders = async (req, res) => {
     const query = `
         SELECT so.id AS orderId,
                so.customer_name AS customerName,
@@ -34,13 +34,50 @@ const getSalesOrder = async (req, res) => {
         // default: sort the response by order id
         const sortedResponse = response.sort((a, b) => a.orderId - b.orderId)
 
-        res.status(200).json(sortedResponse);
+        return res.status(200).json(sortedResponse);
     } catch (error) {
         console.error('Error retrieving sales order:', error);
-        res.status(500).send('Error retrieving sales order');
+        return res.status(500).send('Error retrieving sales order');
+    }
+};
+
+// add a sales order
+const addSalesOrder = async (req, res) => {
+    const { customerName, status, category, country } = req.body;
+
+    if (!customerName || !status || !category || !country) {
+        return res.status(400).send('Missing required fields');
+    }
+
+    // find the category_id from the product_category table
+    const categoryQuery = `
+        SELECT id FROM product_category WHERE name = ?
+    `;
+
+    try {
+        const categoryResults = await executeQuery(categoryQuery, [category]);
+
+        if (categoryResults.length === 0) {
+            return res.status(404).send('Category not found');
+        }
+
+        const categoryId = categoryResults[0].id;
+
+        const insertQuery = `
+            INSERT INTO sales_order (customer_name, status, category_id, country, created_date)
+            VALUES (?, ?, ?, ?, NOW());
+        `;
+
+        const results = await executeQuery(insertQuery, [customerName, status, categoryId, country]);
+
+        return res.status(201).send({ message: 'Sales order added successfully', orderId: results.insertId });
+    } catch (error) {
+        console.error('Error adding sales order:', error);
+        return res.status(500).send('Error adding sales order');
     }
 };
 
 module.exports = {
-    getSalesOrder
+    getSalesOrders,
+    addSalesOrder
 }
