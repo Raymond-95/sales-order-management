@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 // create the MySQL connection pool
 const pool = mysql.createPool({
     connectionLimit: 10,
-    host: 'db',
+    host: '43.216.253.168',
     user: 'devUser',
     password: 'devUser',
     database: 'vuetest'
