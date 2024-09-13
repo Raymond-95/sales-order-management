@@ -5,8 +5,8 @@ const getEnums = require('./enums')
 const getSalesOrder = require('./salesOrder')
 const getFilterOptions = require('./filterOptions')
 
-router.get('/getEnums', getEnums);
-router.get('/getSalesOrder', getSalesOrder);
-router.get('/getFiterOptions', getFilterOptions);
+router.get('/enums', getEnums);
+router.get('/fiterOptions', getFilterOptions);
+router.get('/salesOrder', getSalesOrder);
 
 module.exports = router

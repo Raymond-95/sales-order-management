@@ -41,4 +41,6 @@ const getSalesOrder = async (req, res) => {
     }
 };
 
-module.exports = getSalesOrder
+module.exports = {
+    getSalesOrder
+}
