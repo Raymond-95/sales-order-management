@@ -5,7 +5,14 @@ var mysql = require('mysql');
 
 var app = express();
 const port = 3000;
-dotenv.config();
+
+// override with .env.production if NODE_ENV is set to 'production'
+if (process.env.NODE_ENV === 'production') {
+    dotenv.config({ path: '.env.production' });
+}
+else {
+    dotenv.config();
+}
 
 // parse the requests of content-type 'application/json'
 app.use(bodyParser.json());
