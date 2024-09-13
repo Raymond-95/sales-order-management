@@ -75,8 +75,7 @@ app.get('/api/salesOrders', (req, res) => {
 
     pool.query(query, (error, results) => {
         if (error) {
-            console.error(error);
-            res.status(500).send('Error retrieving sales orders');
+            res.status(500).send(error);
         } else {
             const response = results.map((result) => {
                 const formattedDate = new Date(result.createdDate).toISOString().split('T')[0];
@@ -141,8 +140,7 @@ app.get('/api/filterOptions', (req, res) => {
             });
         })
         .catch(error => {
-            console.error(error);
-            res.status(500).send('Error retrieving filter options');
+            res.status(500).send(error);
         });
 });
 
@@ -185,8 +183,7 @@ app.get('/api/getEnum', (req, res) => {
             });
         })
         .catch(error => {
-            console.error(error);
-            res.status(500).send('Error retrieving enum options');
+            res.status(500).send(error);
         });
 });
 
