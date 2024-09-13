@@ -1,59 +1,15 @@
 var express = require('express');
-const loadEnv = require('./config/envConfig');
-const createDBConnectionPool = require('./db/db');
+const dbConnectionPool = require('./db/db');
 const bodyParser = require('body-parser');
-
-loadEnv();
+const routes = require('./routes')
 
 var app = express();
 const port = 3000;
 
-const dbConnectionPool = createDBConnectionPool();
-
 // parse the requests of content-type 'application/json'
 app.use(bodyParser.json());
 
-// retrieve enum options (status, category, country)
-app.get('/api/getEnums', (req, res) => {
-    // Define the SQL queries for enums
-    const queries = {
-        status: 'SELECT name AS status FROM status;',
-        category: 'SELECT DISTINCT name AS category FROM product_category;',
-        country: 'SELECT DISTINCT name AS country FROM country;'
-    };
-
-    // Helper function to execute a SQL query
-    const executeQuery = (query) => {
-        return new Promise((resolve, reject) => {
-            dbConnectionPool.query(query, (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results.map(row => Object.values(row)[0])); // Extract values
-                }
-            });
-        });
-    };
-
-    // Fetch status, category, and country
-    Promise.all([
-        executeQuery(queries.status),
-        executeQuery(queries.category),
-        executeQuery(queries.country)
-    ])
-        .then(([status, category, country]) => {
-            res.status(200).json({
-                status,
-                category,
-                country
-            });
-        })
-        .catch(error => {
-            console.error('Error retrieving enum options:', error);
-            res.status(500).send('Error retrieving enum options');
-        });
-});
-
+app.use('/api', routes);
 
 // retrieve sales order list
 app.get('/api/salesOrders', (req, res) => {

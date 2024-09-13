@@ -1,4 +1,7 @@
+const loadEnv = require('../config/envConfig');
 var mysql = require('mysql');
+
+loadEnv();
 
 // create the MySQL connection pool
 const createDBConnectionPool = () => mysql.createPool({
@@ -9,4 +12,6 @@ const createDBConnectionPool = () => mysql.createPool({
     database: process.env.DATABASE_NAME
 });
 
-module.exports = createDBConnectionPool;
+const dbConnectionPool = createDBConnectionPool();
+
+module.exports = dbConnectionPool;
