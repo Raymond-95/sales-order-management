@@ -13,12 +13,11 @@ RUN npm install --only=production
 # Copy the source code into the container.
 COPY . .
 
-ARG ENV=dev
-
-# Set environment variables
-ENV DATABASE_URL=mysql://devUser:devUser@43.216.253.168:3306/vuetest
-
+# Expose port 3000
 EXPOSE 3000
 
-# Run the web service on container startup.
-CMD [ "npm", "start" ]
+# Set environment variable default value
+ENV ENV=dev
+
+# Use the entry point script to determine the command to run
+ENTRYPOINT ["/app/entrypoint.sh"]

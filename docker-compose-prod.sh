@@ -1,1 +1,0 @@
-docker-compose --env-file ./frontend/.env.production up --build

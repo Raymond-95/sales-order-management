@@ -1,9 +1,11 @@
 var express = require('express');
+const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 var mysql = require('mysql');
 
 var app = express();
 const port = 3000;
+dotenv.config();
 
 // parse the requests of content-type 'application/json'
 app.use(bodyParser.json());
@@ -11,7 +13,7 @@ app.use(bodyParser.json());
 // create the MySQL connection pool
 const pool = mysql.createPool({
     connectionLimit: 10,
-    host: '43.216.253.168',
+    host: process.env.DATABSE_HOSTNAME,
     user: 'devUser',
     password: 'devUser',
     database: 'vuetest'

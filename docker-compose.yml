@@ -14,12 +14,12 @@ services:
   backend:
     build:
       context: ./backend
+      args:
+        ENV: ${ENV:-dev}
     ports:
       - '3000:3000'
     depends_on:
       - db
-    environment:
-      - DATABASE_URL=mysql://devUser:devUser@db:3306/vuetest
 
   # MySQL database service
   db:

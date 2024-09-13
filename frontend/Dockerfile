@@ -17,7 +17,7 @@ COPY . .
 ARG ENV=dev
 
 # Build the Vue app based on the environment
-RUN if [ "$ENV" -eq "dev" ]; then npm run build --mode ${ENV}; else npm run build; fi
+RUN if [ "$ENV" = "dev" ]; then npm run build:dev; else npm run build:${ENV}; fi
 
 # Use a lightweight web server to serve the built Vue app
 FROM nginx:alpine
