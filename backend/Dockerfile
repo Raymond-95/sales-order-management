@@ -13,5 +13,12 @@ RUN npm install --only=production
 # Copy the source code into the container.
 COPY . .
 
+ARG ENV=dev
+
+# Set environment variables
+ENV DATABASE_URL=mysql://devUser:devUser@db:3306/vuetest
+
+EXPOSE 3000
+
 # Run the web service on container startup.
 CMD [ "npm", "start" ]
