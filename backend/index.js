@@ -1,5 +1,4 @@
 var express = require('express');
-const dbConnectionPool = require('./db/db');
 const bodyParser = require('body-parser');
 const routes = require('./routes')
 
@@ -11,6 +10,6 @@ app.use(bodyParser.json());
 
 app.use('/api', routes);
 
-var server = app.listen(port, function () {
+app.listen(port, function () {
     console.log(`Express App is running`);
 })
