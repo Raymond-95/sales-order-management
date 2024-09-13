@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Add an argument to toggle between build environments (default: dev)
-ARG ENV=dev
+ARG ENV=prod
 
 # Build the Vue app based on the environment
 RUN if [ "$ENV" = "dev" ]; then npm run build:dev; else npm run build:${ENV}; fi
