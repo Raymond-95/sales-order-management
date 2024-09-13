@@ -76,7 +76,7 @@ app.get('/api/salesOrders', (req, res) => {
     pool.query(query, (error, results) => {
         if (error) {
             console.error(error);
-            res.status(500).send('Error retrieving sales orders');
+            res.status(500).send(error);
         } else {
             const response = results.map((result) => {
                 const formattedDate = new Date(result.createdDate).toISOString().split('T')[0];
