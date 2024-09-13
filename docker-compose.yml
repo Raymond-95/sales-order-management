@@ -3,6 +3,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        ENV: ${ENV:-dev}
     ports:
       - '8080:80'
     depends_on:

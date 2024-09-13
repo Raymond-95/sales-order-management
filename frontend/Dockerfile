@@ -12,19 +12,18 @@ RUN npm install
 
 # Copy the rest of the application code
 COPY . .
-COPY .env app/
-COPY .env.production app/
 
-# Build the Vue app
-RUN npm run build
+# Add an argument to toggle between build environments (default: dev)
+ARG ENV=dev
+
+# Build the Vue app based on the environment
+RUN if [ "$ENV" -eq "dev" ]; then npm run build --mode ${ENV}; else npm run build; fi
 
 # Use a lightweight web server to serve the built Vue app
 FROM nginx:alpine
 
 # Copy the build artifacts from the previous stage
 COPY --from=build /app/dist /usr/share/nginx/html
-
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 # Expose the port for the web server
 EXPOSE 80
