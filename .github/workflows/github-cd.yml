@@ -34,7 +34,6 @@ jobs:
 
             # Run the frontend container
             docker run --name frontend \
-              --env-file .env.production \
               -p 8080:80 \
               -d raymondlwy/sales-order-management-frontend:latest
 
