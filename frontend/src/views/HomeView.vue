@@ -4,25 +4,17 @@ import { useRouter } from 'vue-router';
 import Table from '@/components/Table.vue';
 import FilterModal from '@/components/FilterModal.vue';
 import type { Filteration } from '@/typings/Filteration';
-import type { FilterOptions } from '@/typings/FilterOptions';
 import type { SalesOrder, SalesOrderHeaders } from '@/typings/SalesOrder';
-import {
-  getFilterOptions,
-  getSalesOrders,
-} from '@/services/apis/salesOrderService';
+import { getSalesOrders } from '@/services/apis/salesOrderService';
+import { useFilterOptions } from '@/hooks/useFilterOptions';
 
 const router = useRouter();
+const { fetchFilterOptions, filterOptions } = useFilterOptions();
 
 const isModalOpened = ref(false);
 const initialSalesOrderList = ref<SalesOrder[]>([]);
 const salesOrderList = ref<SalesOrder[]>([]);
 const tableHeaders = ref<SalesOrderHeaders>([]);
-const filterOptions = ref<FilterOptions>({
-  status: [],
-  category: [],
-  customerName: [],
-  country: [],
-});
 
 // 1 minute refresh interval
 const refreshInterval = 60000;
@@ -71,15 +63,6 @@ const loadFiltersFromSessionStorage = () => {
     }
   } catch (error) {
     console.error('Error loading filters from sessionStorage: ', error);
-  }
-};
-
-const fetchFilterOptions = async () => {
-  try {
-    const result = await getFilterOptions();
-    filterOptions.value = result;
-  } catch (error) {
-    console.error('Error fetching filter options:', error);
   }
 };
 
