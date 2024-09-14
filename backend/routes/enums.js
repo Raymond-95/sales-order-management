@@ -3,7 +3,7 @@ const executeQuery = require('../utils/queryHelper')
 // retrieve enum options (status, category, country)
 const getEnums = async (req, res) => {
     const queries = {
-        statusCountry: 'SELECT DISTINCT status, country FROM sales_order;',
+        statusCountry: 'SELECT status, country FROM sales_order;',
         category: 'SELECT DISTINCT name AS category FROM product_category;'
     };
 
@@ -14,8 +14,8 @@ const getEnums = async (req, res) => {
         ]);
 
         // process results to extract distinct values
-        const status = statusCountryResults.map(row => row.status);
-        const country = statusCountryResults.map(row => row.country);
+        const status = [...new Set(statusCountryResults.map(row => row.status))];
+        const country = [...new Set(statusCountryResults.map(row => row.country))];
         const category = categoryResults.map(row => row.category);
 
         res.status(200).json({
