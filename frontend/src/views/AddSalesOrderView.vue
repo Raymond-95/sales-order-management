@@ -52,7 +52,7 @@ const submitForm = async () => {
   }
 
   try {
-    await axios.post(`${apiBaseUrl}/salesOrders`, form.value, {
+    await axios.post(`${apiBaseUrl}/salesOrder`, form.value, {
       headers: {
         'Content-Type': 'application/json',
       },

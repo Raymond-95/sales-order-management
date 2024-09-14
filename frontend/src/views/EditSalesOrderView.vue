@@ -64,7 +64,7 @@ const submitForm = async () => {
   const salesOrderId = salesOrder.orderId;
 
   try {
-    await axios.put(`${apiBaseUrl}/salesOrders/${salesOrderId}`, form.value, {
+    await axios.put(`${apiBaseUrl}/salesOrder/${salesOrderId}`, form.value, {
       headers: {
         'Content-Type': 'application/json',
       },

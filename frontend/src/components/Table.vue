@@ -97,7 +97,7 @@ const handleDelete = async (row: SalesOrder) => {
 
   try {
     // Assuming you have an API endpoint like `/api/salesOrders/:id`
-    await axios.delete(`${apiBaseUrl}/salesOrders/${row.orderId}`);
+    await axios.delete(`${apiBaseUrl}/salesOrder/${row.orderId}`);
 
     // Remove the deleted row from the data list
     sortedDataList.value = sortedDataList.value.filter(
