@@ -6,7 +6,6 @@ import { addSalesOrder } from '@/services/apis/salesOrderService';
 
 const router = useRouter();
 
-// Define the form state
 const form = ref({
   customerName: '',
   status: '',
@@ -14,15 +13,13 @@ const form = ref({
   country: '',
 });
 
-// Use the composable to get enum options
 const { statuses, categories, countries, fetchEnumOptions } = useEnumOptions();
 
-// Call the API to fetch enum options when the component is mounted
+// call the API to fetch enum options when the component is mounted
 onMounted(() => {
   fetchEnumOptions();
 });
 
-// Validation for each field
 const validateForm = () => {
   if (!form.value.customerName) {
     alert('Customer name is required');
@@ -43,7 +40,6 @@ const validateForm = () => {
   return true;
 };
 
-// Handle form submission
 const submitForm = async () => {
   if (!validateForm()) {
     return;

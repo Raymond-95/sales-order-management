@@ -19,7 +19,7 @@ const sortDirection = ref<'asc' | 'desc'>('asc');
 const currentSortKey = ref<string | null>(null);
 const showOptionsIndex = ref<number | null>(null);
 
-// Computed property to format headers
+// computed property to format headers
 const formattedHeaders = computed(() =>
   headers.map((header) =>
     header.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase(),
@@ -69,7 +69,7 @@ const handleOptionsClick = (index: number) => {
   showOptionsIndex.value = showOptionsIndex.value === index ? null : index;
 };
 
-// Watch for changes to props.dataList and update sortedDataList accordingly
+// watch for changes to props.dataList and update sortedDataList accordingly
 watch(
   () => dataList,
   (newDataList) => {
@@ -78,7 +78,6 @@ watch(
   { deep: true },
 );
 
-// Implement handlers for edit and delete actions
 const handleEdit = (row: SalesOrder) => {
   router.push({
     name: 'EditSalesOrder',

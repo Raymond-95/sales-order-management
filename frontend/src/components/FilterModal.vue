@@ -73,7 +73,7 @@ const closeModal = () => {
     );
 
     if (confirmed) {
-      // User clicked "OK"
+      // user clicked "OK"
       onModalClosed();
     }
   } else {
@@ -89,7 +89,6 @@ const toggleAllStatuses = () => {
   }
 };
 
-// Handle selecting/deselecting "All" category
 const toggleAllCategories = () => {
   if (selectedCategories.value.includes('All')) {
     selectedCategories.value = ['All'];

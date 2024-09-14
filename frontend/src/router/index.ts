@@ -27,7 +27,6 @@ const router = createRouter({
           ? JSON.parse(decodeURIComponent(salesOrderQuery))
           : ({} as SalesOrder);
 
-        // Extract other query params as needed
         return {
           salesOrder,
         };

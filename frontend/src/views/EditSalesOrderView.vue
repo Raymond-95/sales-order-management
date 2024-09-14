@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useEnumOptions } from '@/hooks/useEnumOptions'; // Import the composable
+import { useRouter } from 'vue-router';
+import { useEnumOptions } from '@/hooks/useEnumOptions';
 import type { SalesOrder } from '@/typings/SalesOrder';
 import { updateSalesOrder } from '@/services/apis/salesOrderService';
 
-// Accept props from parent component
 const { salesOrder } = defineProps<{
   salesOrder: SalesOrder;
   statuses: string[];
@@ -14,17 +13,15 @@ const { salesOrder } = defineProps<{
 }>();
 
 const router = useRouter();
-const route = useRoute();
 
-// Destructure enum options from the composable
 const { statuses, categories, countries, fetchEnumOptions } = useEnumOptions();
 
-// Call the API to fetch enum options when the component is mounted
+// call the API to fetch enum options when the component is mounted
 onMounted(() => {
   fetchEnumOptions();
 });
 
-// Create form based on the salesOrder prop
+// create form based on the salesOrder prop
 const form = ref({
   customerName: salesOrder.customerName || '',
   status: salesOrder.status || '',
@@ -32,7 +29,6 @@ const form = ref({
   country: salesOrder.country || '',
 });
 
-// Validation for each field
 const validateForm = () => {
   if (!form.value.customerName) {
     alert('Customer name is required');
@@ -53,7 +49,6 @@ const validateForm = () => {
   return true;
 };
 
-// Handle form submission
 const submitForm = async () => {
   if (!validateForm()) {
     return;

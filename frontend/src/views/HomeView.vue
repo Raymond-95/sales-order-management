@@ -53,7 +53,7 @@ const fetchSalesOrders = async () => {
   }
 };
 
-// Load filters from session storage
+// load filters from session storage
 const loadFiltersFromSessionStorage = () => {
   try {
     const savedFilters = sessionStorage.getItem('filters');
