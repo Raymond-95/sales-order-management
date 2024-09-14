@@ -119,7 +119,8 @@ const handleDelete = async (row: SalesOrder) => {
           {{ header }}
           <img :src="SortImage" width="10" />
         </th>
-        <th>Actions</th>
+        <!-- conditionally render 'Actions' header if there are any headers -->
+        <th v-if="headers.length > 0">Actions</th>
       </tr>
     </thead>
 
