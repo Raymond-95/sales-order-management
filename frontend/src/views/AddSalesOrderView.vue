@@ -2,16 +2,12 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEnumOptions } from '@/hooks/useEnumOptions';
+import { useSalesOrderForm } from '@/hooks/useSalesOrderForm';
 import { addSalesOrder } from '@/services/apis/salesOrderService';
 
 const router = useRouter();
 
-const form = ref({
-  customerName: '',
-  status: '',
-  category: '',
-  country: '',
-});
+const { formRef, isFormValuesValid } = useSalesOrderForm();
 
 const { statuses, categories, countries, fetchEnumOptions } = useEnumOptions();
 
@@ -20,41 +16,15 @@ onMounted(() => {
   fetchEnumOptions();
 });
 
-const validateForm = () => {
-  if (!form.value.customerName) {
-    alert('Customer name is required');
-    return false;
-  }
-  if (!form.value.status) {
-    alert('Status is required');
-    return false;
-  }
-  if (!form.value.category) {
-    alert('Category is required');
-    return false;
-  }
-  if (!form.value.country) {
-    alert('Country is required');
-    return false;
-  }
-  return true;
-};
-
 const submitForm = async () => {
-  if (!validateForm()) {
+  if (!isFormValuesValid()) {
     return;
   }
 
   try {
-    await addSalesOrder(form.value);
+    await addSalesOrder(formRef.value);
 
     alert('Sales order added successfully');
-    form.value = {
-      customerName: '',
-      status: '',
-      category: '',
-      country: '',
-    };
 
     router.push({ name: 'Home' });
   } catch (error) {
@@ -74,7 +44,7 @@ const submitForm = async () => {
         </label>
         <input
           id="customer-name"
-          v-model="form.customerName"
+          v-model="formRef.customerName"
           type="text"
           required
         />
@@ -84,7 +54,7 @@ const submitForm = async () => {
         <label for="status">
           Status: <span class="required-asterisk">*</span>
         </label>
-        <select id="status" v-model="form.status" required>
+        <select id="status" v-model="formRef.status" required>
           <option value="">Select Status</option>
           <option v-for="status in statuses" :key="status" :value="status">
             {{ status }}
@@ -96,7 +66,7 @@ const submitForm = async () => {
         <label for="category">
           Category: <span class="required-asterisk">*</span>
         </label>
-        <select id="category" v-model="form.category" required>
+        <select id="category" v-model="formRef.category" required>
           <option value="">Select Category</option>
           <option
             v-for="category in categories"
@@ -112,7 +82,7 @@ const submitForm = async () => {
         <label for="country">
           Country: <span class="required-asterisk">*</span>
         </label>
-        <select id="country" v-model="form.country" required>
+        <select id="country" v-model="formRef.country" required>
           <option value="">Select Country</option>
           <option v-for="country in countries" :key="country" :value="country">
             {{ country }}
@@ -120,13 +90,14 @@ const submitForm = async () => {
         </select>
       </div>
 
-      <button type="submit">Add Customer</button>
+      <button type="submit">Confirm</button>
     </form>
   </div>
 </template>
 
 <style scoped>
 .add-sales-order {
+  min-width: 400px;
   max-width: 500px;
   margin: auto;
   padding: 20px;
