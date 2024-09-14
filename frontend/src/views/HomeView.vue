@@ -7,6 +7,7 @@ import type { Filteration } from '@/typings/Filteration';
 import type { SalesOrder, SalesOrderHeaders } from '@/typings/SalesOrder';
 import { getSalesOrders } from '@/services/apis/salesOrderService';
 import { useFilterOptions } from '@/hooks/useFilterOptions';
+import { useSalesOrdersFilter } from '@/hooks/useSalesOrderFilter';
 
 const router = useRouter();
 const { fetchFilterOptions, filterOptions } = useFilterOptions();
@@ -15,6 +16,8 @@ const isModalOpened = ref(false);
 const initialSalesOrderList = ref<SalesOrder[]>([]);
 const salesOrderList = ref<SalesOrder[]>([]);
 const tableHeaders = ref<SalesOrderHeaders>([]);
+
+const { filterSalesOrders } = useSalesOrdersFilter();
 
 // 1 minute refresh interval
 const refreshInterval = 60000;
@@ -76,54 +79,9 @@ const hideFilterModal = () => {
 
 const applyFilter = (filters: Filteration) => {
   // filter the list based on filter criteria
-  const filteredSalesOrders = initialSalesOrderList.value.filter(
-    (salesOrder) => {
-      // filter by created date range
-      const isValidFromDate = filters.createdDateRange.from !== '';
-      const isValidToDate = filters.createdDateRange.to !== '';
-      const createdDate = new Date(salesOrder.createdDate);
-      const fromDate = new Date(filters.createdDateRange.from);
-      const toDate = new Date(filters.createdDateRange.to);
-
-      const isWithinDateRange =
-        (!isValidFromDate && !isValidToDate) ||
-        (isValidFromDate &&
-          isValidToDate &&
-          createdDate >= fromDate &&
-          createdDate <= toDate) ||
-        (isValidFromDate && !isValidToDate && createdDate >= fromDate) ||
-        (!isValidFromDate && isValidToDate && createdDate <= toDate);
-
-      // filter by customer name
-      const isMatchingCustomerName = salesOrder.customerName.includes(
-        filters.customerName,
-      );
-
-      // filter by status
-      const isMatchingStatus =
-        filters.status.length === 0 ||
-        filters.status.includes('All') ||
-        filters.status.includes(salesOrder.status);
-
-      // filter by category
-      const isMatchingCategory =
-        filters.category.length === 0 ||
-        filters.category.includes('All') ||
-        filters.category.includes(salesOrder.categoryGroup);
-
-      // filter by country
-      const isMatchingCountry =
-        filters.country === '' || salesOrder.country === filters.country;
-
-      // return true if all criteria match
-      return (
-        isWithinDateRange &&
-        isMatchingCustomerName &&
-        isMatchingStatus &&
-        isMatchingCategory &&
-        isMatchingCountry
-      );
-    },
+  const filteredSalesOrders = filterSalesOrders(
+    initialSalesOrderList.value,
+    filters,
   );
 
   // update the list
