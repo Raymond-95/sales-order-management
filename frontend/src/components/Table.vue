@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
-import SortImage from '../assets/sort.png';
-import DotsImage from '../assets/dots.png';
-import type { SalesOrder, SalesOrderHeaders } from '../typings/SalesOrder';
+import SortImage from '@/assets/sort.png';
+import DotsImage from '@/assets/dots.png';
+import type { SalesOrder, SalesOrderHeaders } from '@/typings/SalesOrder';
+import { deleteSalesOrder } from '@/services/apis/salesOrderService';
 
 interface Props {
   headers: SalesOrderHeaders;
   dataList: SalesOrder[];
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const router = useRouter();
 
 const { headers, dataList } = defineProps<Props>();
@@ -96,10 +95,9 @@ const handleDelete = async (row: SalesOrder) => {
   if (!confirmDelete) return;
 
   try {
-    // Assuming you have an API endpoint like `/api/salesOrders/:id`
-    await axios.delete(`${apiBaseUrl}/salesOrder/${row.orderId}`);
+    await deleteSalesOrder(row.orderId);
 
-    // Remove the deleted row from the data list
+    // remove the deleted row from the data list
     sortedDataList.value = sortedDataList.value.filter(
       (item) => item.orderId !== row.orderId,
     );

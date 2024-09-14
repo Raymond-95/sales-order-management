@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useEnumOptions } from '@/hooks/useEnumOptions';
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+import { addSalesOrder } from '@/services/apis/salesOrderService';
 
 const router = useRouter();
 
@@ -52,11 +50,7 @@ const submitForm = async () => {
   }
 
   try {
-    await axios.post(`${apiBaseUrl}/salesOrder`, form.value, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    await addSalesOrder(form.value);
 
     alert('Sales order added successfully');
     form.value = {

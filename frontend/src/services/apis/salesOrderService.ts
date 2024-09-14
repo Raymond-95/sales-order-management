@@ -1,57 +1,40 @@
 import apiClient from './apiService';
-import type { SalesOrder } from '@/typings/SalesOrder';
+import type { SalesOrder, SalesOrderPayload } from '@/typings/SalesOrder';
 import type { FilterOptions } from '@/typings/FilterOptions';
+import type { EnumOptions } from '@/typings/EnumOptions';
+
+const getEnums = async (): Promise<EnumOptions> => {
+  const response = await apiClient.get<EnumOptions>('/enums');
+  return response.data;
+};
 
 const getFilterOptions = async (): Promise<FilterOptions> => {
-  try {
-    const response = await apiClient.get<FilterOptions>('/filterOptions');
-    return response.data;
-  } catch (error) {
-    throw new Error('Error retrieving filter options');
-  }
+  const response = await apiClient.get<FilterOptions>('/filterOptions');
+  return response.data;
 };
 
 const getSalesOrders = async (): Promise<SalesOrder[]> => {
-  try {
-    const response = await apiClient.get<SalesOrder[]>('/salesOrders');
-    return response.data;
-  } catch (error) {
-    throw new Error('Error retrieving sales orders');
-  }
+  const response = await apiClient.get<SalesOrder[]>('/salesOrders');
+  return response.data;
 };
 
-const addSalesOrder = async (salesOrder: SalesOrder): Promise<SalesOrder> => {
-  try {
-    const response = await apiClient.post<SalesOrder>(
-      '/salesOrders',
-      salesOrder,
-    );
-    return response.data;
-  } catch (error) {
-    throw new Error('Error adding sales order');
-  }
+const addSalesOrder = async (salesOrder: SalesOrderPayload): Promise<void> => {
+  await apiClient.post<SalesOrder>('/salesOrder', salesOrder);
 };
 
 const updateSalesOrder = async (
-  salesOrderId: string,
-  salesOrderData: SalesOrder,
+  salesOrderId: number,
+  salesOrderData: SalesOrderPayload,
 ): Promise<void> => {
-  try {
-    await apiClient.put(`/salesOrder/${salesOrderId}`, salesOrderData);
-  } catch (error) {
-    throw new Error('Error updating sales order');
-  }
+  await apiClient.put(`/salesOrder/${salesOrderId}`, salesOrderData);
 };
 
-const deleteSalesOrder = async (orderId: string): Promise<void> => {
-  try {
-    await apiClient.delete(`/salesOrder/${orderId}`);
-  } catch (error) {
-    throw new Error('Error deleting sales order');
-  }
+const deleteSalesOrder = async (orderId: number): Promise<void> => {
+  await apiClient.delete(`/salesOrder/${orderId}`);
 };
 
 export {
+  getEnums,
   getFilterOptions,
   getSalesOrders,
   addSalesOrder,

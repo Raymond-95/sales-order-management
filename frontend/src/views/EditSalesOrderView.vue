@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
 import { useEnumOptions } from '@/hooks/useEnumOptions'; // Import the composable
 import type { SalesOrder } from '@/typings/SalesOrder';
+import { updateSalesOrder } from '@/services/apis/salesOrderService';
 
 // Accept props from parent component
 const { salesOrder } = defineProps<{
@@ -53,8 +53,6 @@ const validateForm = () => {
   return true;
 };
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
 // Handle form submission
 const submitForm = async () => {
   if (!validateForm()) {
@@ -64,11 +62,7 @@ const submitForm = async () => {
   const salesOrderId = salesOrder.orderId;
 
   try {
-    await axios.put(`${apiBaseUrl}/salesOrder/${salesOrderId}`, form.value, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    await updateSalesOrder(salesOrderId, form.value);
 
     alert('Sales order updated successfully');
     router.push({ name: 'Home' });

@@ -9,3 +9,8 @@ export interface SalesOrder {
 }
 
 export type SalesOrderHeaders = Array<keyof SalesOrder>;
+
+export type SalesOrderPayload = Omit<
+  SalesOrder,
+  'orderId' | 'categoryGroup' | 'createdDate'
+>;

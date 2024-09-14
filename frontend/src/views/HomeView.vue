@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
-import Table from '../components/Table.vue';
-import FilterModal from '../components/FilterModal.vue';
-import type { Filteration } from '../typings/Filteration';
-import type { FilterOptions } from '../typings/FilterOptions';
-import type { SalesOrder, SalesOrderHeaders } from '../typings/SalesOrder';
+import Table from '@/components/Table.vue';
+import FilterModal from '@/components/FilterModal.vue';
+import type { Filteration } from '@/typings/Filteration';
+import type { FilterOptions } from '@/typings/FilterOptions';
+import type { SalesOrder, SalesOrderHeaders } from '@/typings/SalesOrder';
+import {
+  getFilterOptions,
+  getSalesOrders,
+} from '@/services/apis/salesOrderService';
 
 const router = useRouter();
 
@@ -20,8 +23,6 @@ const filterOptions = ref<FilterOptions>({
   customerName: [],
   country: [],
 });
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 // 1 minute refresh interval
 const refreshInterval = 60000;
@@ -44,10 +45,10 @@ onMounted(() => {
 
 const fetchSalesOrders = async () => {
   try {
-    const response = await axios.get(`${apiBaseUrl}/salesOrders`);
+    const result = await getSalesOrders();
 
-    initialSalesOrderList.value = response.data;
-    salesOrderList.value = response.data;
+    initialSalesOrderList.value = result;
+    salesOrderList.value = result;
 
     tableHeaders.value = Object.keys(initialSalesOrderList.value[0]).filter(
       (header) => header !== 'categoryGroup',
@@ -75,8 +76,8 @@ const loadFiltersFromSessionStorage = () => {
 
 const fetchFilterOptions = async () => {
   try {
-    const response = await axios.get(`${apiBaseUrl}/filterOptions`);
-    filterOptions.value = response.data;
+    const result = await getFilterOptions();
+    filterOptions.value = result;
   } catch (error) {
     console.error('Error fetching filter options:', error);
   }
