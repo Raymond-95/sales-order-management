@@ -95,7 +95,12 @@ const addSalesOrder = () => {
 
 <template>
   <main>
-    <div class="action-container">
+    <!-- show a message if salesOrderList is empty -->
+    <div v-if="salesOrderList.length === 0" class="empty-state">
+      No sales orders available.
+    </div>
+
+    <div class="action-container" v-if="salesOrderList.length > 0">
       <button @click="showFilterModal">filter</button>
     </div>
 
@@ -106,9 +111,18 @@ const addSalesOrder = () => {
       :applyFilter="applyFilter"
     />
 
-    <Table :headers="tableHeaders" :data-list="salesOrderList" />
+    <!-- render the table if there are sales orders -->
+    <Table
+      v-if="salesOrderList.length > 0"
+      :headers="tableHeaders"
+      :data-list="salesOrderList"
+    />
 
-    <div class="action-container action-footer-container">
+    <!-- show the Add button only if there are sales orders -->
+    <div
+      class="action-container action-footer-container"
+      v-if="salesOrderList.length > 0"
+    >
       <button @click="addSalesOrder">Add</button>
     </div>
   </main>
