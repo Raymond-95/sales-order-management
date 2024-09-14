@@ -6,7 +6,7 @@ const { getSalesOrders, addSalesOrder, updateSalesOrder, deleteSalesOrder } = re
 const getFilterOptions = require('./filterOptions')
 
 router.get('/enums', getEnums);
-router.get('/fiterOptions', getFilterOptions);
+router.get('/filterOptions', getFilterOptions);
 
 router.get('/salesOrders', getSalesOrders);
 router.post('/salesOrder', addSalesOrder);

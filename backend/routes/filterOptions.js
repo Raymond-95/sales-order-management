@@ -4,7 +4,7 @@ const executeQuery = require('../utils/queryHelper')
 const getFilterOptions = async (req, res) => {
 
     const queries = {
-        statusCountryCustomer: 'SELECT DISTINCT status, country, customer_name FROM sales_order;',
+        statusCountryCustomer: 'SELECT status, country, customer_name FROM sales_order;',
         category: 'SELECT DISTINCT category_group AS category FROM product_category;'
     };
 
@@ -14,9 +14,10 @@ const getFilterOptions = async (req, res) => {
             executeQuery(queries.category)
         ]);
 
-        const status = statusCountryCustomerResults.map(row => row.status);
-        const country = statusCountryCustomerResults.map(row => row.country);
-        const customerName = statusCountryCustomerResults.map(row => row.customer_name);
+        // use Set to get distinct data
+        const status = [...new Set(statusCountryCustomerResults.map(row => row.status))];
+        const country = [...new Set(statusCountryCustomerResults.map(row => row.country))];
+        const customerName = [...new Set(statusCountryCustomerResults.map(row => row.customer_name))];
         const category = categoryResults.map(row => row.category);
 
         res.status(200).json({
