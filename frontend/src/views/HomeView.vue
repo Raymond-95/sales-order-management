@@ -49,23 +49,23 @@ const fetchSalesOrders = async () => {
       (header) => header !== 'categoryGroup',
     ) as SalesOrderHeaders;
 
-    // Load filters from session storage
-    loadFiltersFromSessionStorage();
+    // Load filters from local storage
+    loadFiltersFromLocalStorage();
   } catch (error) {
     console.error('Error fetching sales orders:', error);
   }
 };
 
-// load filters from session storage
-const loadFiltersFromSessionStorage = () => {
+// load filters from local storage
+const loadFiltersFromLocalStorage = () => {
   try {
-    const savedFilters = sessionStorage.getItem('filters');
+    const savedFilters = localStorage.getItem('filters');
     if (savedFilters) {
       const filters: Filteration = JSON.parse(savedFilters);
       applyFilter(filters);
     }
   } catch (error) {
-    console.error('Error loading filters from sessionStorage: ', error);
+    console.error('Error loading filters from localStorage: ', error);
   }
 };
 

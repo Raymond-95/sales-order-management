@@ -30,10 +30,10 @@ const selectedStatuses = ref<string[]>(['All']);
 const selectedCategories = ref<string[]>(['All']);
 const selectedCountry = ref('');
 
-// load filters from session storage
-const loadFiltersFromSessionStorage = () => {
+// load filters from local storage
+const loadFiltersFromLocalStorage = () => {
   try {
-    const savedFilters = sessionStorage.getItem('filters');
+    const savedFilters = localStorage.getItem('filters');
     if (savedFilters) {
       const {
         createdDateRange: savedDateRange,
@@ -49,13 +49,13 @@ const loadFiltersFromSessionStorage = () => {
       selectedCountry.value = savedCountry;
     }
   } catch (error) {
-    console.error('Error loading filters from sessionStorage: ', error);
+    console.error('Error loading filters from localStorage: ', error);
   }
 };
 
 // load filters when the component is mounted
 onMounted(() => {
-  loadFiltersFromSessionStorage();
+  loadFiltersFromLocalStorage();
 });
 
 const closeModal = () => {
@@ -107,11 +107,11 @@ const handleSubmit = () => {
   };
 
   try {
-    // save the filteration object to sessionStorage
-    sessionStorage.setItem('filters', JSON.stringify(filteration));
+    // save the filteration object to localStorage
+    localStorage.setItem('filters', JSON.stringify(filteration));
   } catch (error) {
     // handle any errors that occur during saving
-    console.error('Error saving filters to sessionStorage: ', error);
+    console.error('Error saving filters to localStorage: ', error);
   }
 
   applyFilter?.(filteration);
