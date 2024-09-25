@@ -122,8 +122,8 @@ const handleSubmit = () => {
 const handleReset = () => {
   Object.assign(createdDateRange.value, { from: '', to: '' });
   selectedCustomerName.value = '';
-  selectedStatuses.value = [];
-  selectedCategories.value = [];
+  selectedStatuses.value = ['All'];
+  selectedCategories.value = ['All'];
   selectedCountry.value = '';
 };
 </script>
