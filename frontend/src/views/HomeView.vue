@@ -23,128 +23,119 @@ const { filterSalesOrders } = useSalesOrdersFilter();
 const refreshInterval = 60000;
 
 const refreshPage = () => {
-  window.location.reload();
+    window.location.reload();
 };
 
 // auto-refreshed every minute
 onMounted(() => {
-  const intervalId = setInterval(refreshPage, refreshInterval);
+    const intervalId = setInterval(refreshPage, refreshInterval);
 
-  onUnmounted(() => {
-    clearInterval(intervalId);
-  });
+    onUnmounted(() => {
+        clearInterval(intervalId);
+    });
 
-  fetchSalesOrders();
-  fetchFilterOptions();
+    fetchSalesOrders();
+    fetchFilterOptions();
 });
 
 const fetchSalesOrders = async () => {
-  try {
-    const result = await getSalesOrders();
+    try {
+        const result = await getSalesOrders();
 
-    initialSalesOrderList.value = result;
-    salesOrderList.value = result;
+        initialSalesOrderList.value = result;
+        salesOrderList.value = result;
 
-    tableHeaders.value = Object.keys(initialSalesOrderList.value[0]).filter(
-      (header) => header !== 'categoryGroup',
-    ) as SalesOrderHeaders;
+        tableHeaders.value = Object.keys(initialSalesOrderList.value[0]).filter(
+            (header) => header !== 'categoryGroup',
+        ) as SalesOrderHeaders;
 
-    // Load filters from local storage
-    loadFiltersFromLocalStorage();
-  } catch (error) {
-    console.error('Error fetching sales orders:', error);
-  }
+        // Load filters from local storage
+        loadFiltersFromLocalStorage();
+    } catch (error) {
+        console.error('Error fetching sales orders:', error);
+    }
 };
 
 // load filters from local storage
 const loadFiltersFromLocalStorage = () => {
-  try {
-    const savedFilters = localStorage.getItem('filters');
-    if (savedFilters) {
-      const filters: Filteration = JSON.parse(savedFilters);
-      applyFilter(filters);
+    try {
+        const savedFilters = localStorage.getItem('filters');
+        if (savedFilters) {
+            const filters: Filteration = JSON.parse(savedFilters);
+            applyFilter(filters);
+        }
+    } catch (error) {
+        console.error('Error loading filters from localStorage: ', error);
     }
-  } catch (error) {
-    console.error('Error loading filters from localStorage: ', error);
-  }
 };
 
 const showFilterModal = () => {
-  isModalOpened.value = true;
+    isModalOpened.value = true;
 };
 
 const hideFilterModal = () => {
-  isModalOpened.value = false;
+    isModalOpened.value = false;
 };
 
 const applyFilter = (filters: Filteration) => {
-  // filter the list based on filter criteria
-  const filteredSalesOrders = filterSalesOrders(
-    initialSalesOrderList.value,
-    filters,
-  );
+    // filter the list based on filter criteria
+    const filteredSalesOrders = filterSalesOrders(
+        initialSalesOrderList.value,
+        filters,
+    );
 
-  // update the list
-  salesOrderList.value = [...filteredSalesOrders];
+    // update the list
+    salesOrderList.value = [...filteredSalesOrders];
 };
 
 const addSalesOrder = () => {
-  router.push({ name: 'AddSalesOrder' });
+    router.push({ name: 'AddSalesOrder' });
 };
 </script>
 
 <template>
-  <main>
-    <!-- show a message if salesOrderList is empty -->
-    <div v-if="salesOrderList.length === 0" class="empty-state">
-      No sales orders available.
-    </div>
+    <main>
+        <!-- show a message if salesOrderList is empty -->
+        <div v-if="salesOrderList.length === 0" class="empty-state">
+            No sales orders available.
+        </div>
 
-    <div class="action-container" v-if="salesOrderList.length > 0">
-      <button @click="showFilterModal">filter</button>
-    </div>
+        <div v-else>
+            <div class="action-container">
+                <button @click="showFilterModal">filter</button>
+            </div>
 
-    <FilterModal
-      :isOpen="isModalOpened"
-      :onModalClosed="hideFilterModal"
-      :filterOptions="filterOptions"
-      :applyFilter="applyFilter"
-    />
+            <FilterModal :isOpen="isModalOpened" :onModalClosed="hideFilterModal" :filterOptions="filterOptions"
+                :applyFilter="applyFilter" />
 
-    <!-- render the table if there are sales orders -->
-    <Table
-      v-if="salesOrderList.length > 0"
-      :headers="tableHeaders"
-      :data-list="salesOrderList"
-    />
+            <!-- render the table if there are sales orders -->
+            <Table :headers="tableHeaders" :data-list="salesOrderList" />
 
-    <!-- show the Add button only if there are sales orders -->
-    <div
-      class="action-container action-footer-container"
-      v-if="salesOrderList.length > 0"
-    >
-      <button @click="addSalesOrder">Add</button>
-    </div>
-  </main>
+            <!-- show the Add button only if there are sales orders -->
+            <div class="action-container action-footer-container">
+                <button @click="addSalesOrder">Add</button>
+            </div>
+        </div>
+    </main>
 </template>
 
 <style scoped>
 main {
-  background-color: '#ffffff';
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding-top: 15px;
+    background-color: '#ffffff';
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding-top: 15px;
 }
 
 .action-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
 }
 
 .action-footer-container {
-  margin-top: 15px;
-  margin-bottom: 0px;
+    margin-top: 15px;
+    margin-bottom: 0px;
 }
 </style>
