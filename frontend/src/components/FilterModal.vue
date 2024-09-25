@@ -63,8 +63,8 @@ const closeModal = () => {
     createdDateRange.value.from !== '' ||
     createdDateRange.value.to !== '' ||
     selectedCustomerName.value !== '' ||
-    selectedStatuses.value.length > 0 ||
-    selectedCategories.value.length > 0 ||
+    (selectedStatuses.value.length > 0 && !(selectedStatuses.value.length === 1 && selectedStatuses.value[0] === 'All')) ||
+    (selectedCategories.value.length > 0 && !(selectedCategories.value.length === 1 && selectedCategories.value[0] === 'All')) ||
     selectedCountry.value !== '';
 
   if (isStateChanged) {

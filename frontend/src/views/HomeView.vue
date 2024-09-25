@@ -96,7 +96,7 @@ const addSalesOrder = () => {
 <template>
     <main>
         <!-- show a message if salesOrderList is empty -->
-        <div v-if="salesOrderList.length === 0" class="empty-state">
+        <div v-if="initialSalesOrderList.length === 0" class="empty-state">
             No sales orders available.
         </div>
 
