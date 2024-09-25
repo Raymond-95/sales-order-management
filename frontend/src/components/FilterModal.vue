@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch, onMounted } from 'vue';
+import { defineProps, defineEmits, ref, onMounted } from 'vue';
 import type { CreatedDateRange, Filteration } from '@/typings/Filteration';
 import type { FilterOptions } from '@/typings/FilterOptions';
 
