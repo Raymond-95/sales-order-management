@@ -1,4 +1,4 @@
-import apiClient from './apiService';
+import apiClient from '../apiService';
 import type { SalesOrder, SalesOrderPayload } from '@/typings/SalesOrder';
 import type { FilterOptions } from '@/typings/FilterOptions';
 import type { EnumOptions } from '@/typings/EnumOptions';
