@@ -79,22 +79,6 @@ const closeModal = () => {
   }
 };
 
-const toggleAllStatuses = () => {
-  if (selectedStatuses.value.includes('All')) {
-    selectedStatuses.value = ['All'];
-  } else if (selectedStatuses.value.length === 0) {
-    selectedStatuses.value = [];
-  }
-};
-
-const toggleAllCategories = () => {
-  if (selectedCategories.value.includes('All')) {
-    selectedCategories.value = ['All'];
-  } else if (selectedCategories.value.length === 0) {
-    selectedCategories.value = [];
-  }
-};
-
 const handleSubmit = () => {
   const filteration = {
     createdDateRange: createdDateRange.value,
@@ -185,7 +169,6 @@ const handleReset = () => {
                     id="status-all"
                     v-model="selectedStatuses"
                     value="All"
-                    @change="toggleAllStatuses"
                   />
                   <label for="status-all">All</label>
                 </div>
@@ -218,7 +201,6 @@ const handleReset = () => {
                     id="category-all"
                     v-model="selectedCategories"
                     value="All"
-                    @change="toggleAllCategories"
                   />
                   <label for="category-all">All</label>
                 </div>
