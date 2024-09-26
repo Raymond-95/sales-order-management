@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import type { CreatedDateRange, Filteration } from '@/typings/Filteration';
 import type { FilterOptions } from '@/typings/FilterOptions';
+
+interface Props {
+  isOpen: boolean;
+  onModalClosed: () => void;
+  filterOptions: FilterOptions;
+  applyFilter?: (filters: Filteration) => void;
+}
 
 const {
   onModalClosed,
@@ -12,12 +19,7 @@ const {
     country: [],
   },
   applyFilter,
-} = defineProps<{
-  isOpen: boolean;
-  onModalClosed: () => void;
-  filterOptions: FilterOptions;
-  applyFilter?: (filters: Filteration) => void;
-}>();
+} = defineProps<Props>();
 
 const createdDateRange = ref<CreatedDateRange>({
   from: '',

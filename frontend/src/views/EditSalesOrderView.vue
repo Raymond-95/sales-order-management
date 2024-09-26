@@ -6,12 +6,14 @@ import { useSalesOrderForm } from '@/hooks/useSalesOrderForm';
 import type { SalesOrder } from '@/typings/SalesOrder';
 import { updateSalesOrder } from '@/services/apis/salesOrderService';
 
-const { salesOrder } = defineProps<{
+interface Props {
   salesOrder: SalesOrder;
   statuses: string[];
   categories: string[];
   countries: string[];
-}>();
+}
+
+const { salesOrder } = defineProps<Props>();
 
 const router = useRouter();
 
